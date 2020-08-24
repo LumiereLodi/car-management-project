@@ -1,0 +1,67 @@
+.car-detail{
+
+    width: 60%;
+    margin:16px auto;
+    border:1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+    padding-left: 20px;
+    text-align: center;
+
+}
+
+.login{
+    width: 60%;
+    margin:16px auto;
+    border:1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+    padding: 20px;
+}
+
+.car-make{
+    color: cornflowerblue;
+    font-family: 'Oswald', sans-serif;
+}
+
+.details{
+    font-family: 'Oswald', sans-serif;
+}
+
+.title{
+    text-align: center;
+}
+.edit{
+    font-weight: bold;
+
+}
+
+
+
+.form-title{
+    font-family: 'Oswald', sans-serif
+}
+
+.userName{
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+
+}
+
+.error-notice{
+    margin: 1rem 0;
+    padding: 0.5rem;
+    border: 1px solid #a54c4c;
+    border-radius: 8px;
+    background-color: #f8d6d6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.errbtn{
+    width:20px;
+    height: 20px;
+    border-radius: 50%;
+    color: #ffff;
+    background-color: #c42a2a;
+
+}
