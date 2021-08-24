@@ -39,8 +39,6 @@ if(process.env.NODE_ENV === "production"){
     app.use(express.static("/client-side/build"))
 } 
 
-
-console.log(__dirname)
 /**CAR DATABASE**/
 
 
@@ -285,8 +283,8 @@ const checkToken = (req, res)=>{
 
 //can be handled in the front end.
 app.get("*", (req, res)=> {
-    console.log("random path")
-    res.sendFile("client-side/build/index.html")
+    res.sendFile(path.join(__dirname, "client-side/build/index.html"))
+    //console.log(path.join(__dirname, "client-side/build/index.html"))
 })
 
 
