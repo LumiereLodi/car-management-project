@@ -26,13 +26,13 @@ const Register = ()=>{
 
             /**Registering the user**/
             const newUser = {email, password, passwordCheck, displayName};
-            await Axios.post("http://localhost:5000/users/register", newUser);
+            await Axios.post("/users/register", newUser);
 
 
             /**when the user has registered we automatically log him/her in
              * tht is why we have the code below
              * **/
-            const loginRes = await Axios.post("http://localhost:5000/users/login", {
+            const loginRes = await Axios.post("/users/login", {
                 email,
                 password,
             });

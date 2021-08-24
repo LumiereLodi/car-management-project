@@ -30,7 +30,7 @@ const ListCars = ()=> {
     const deleteCar = async (id)=>{
         try{
 
-            await fetch(`http://localhost:5000/cars/${id}`,{
+            await fetch(`/cars/${id}`,{
                 method: "DELETE"
             });
             setCar(cars.filter(car => car.car_id !== id));
@@ -54,7 +54,7 @@ const ListCars = ()=> {
             const token = localStorage.getItem("auth-token");
 
             /**in order to list the car of the current logged in user need to send the request with the user token.**/
-            const response = await Axios.get("http://localhost:5000/cars", {
+            const response = await Axios.get("/cars", {
                 headers:{
                     "x-auth-token": token,
                 }});
@@ -86,6 +86,7 @@ const ListCars = ()=> {
      * THIS FUNCTION IS CALLED AS SOON AS THE COMPONENT IS RENDERED BY THE useEFFECT
      *
      * **/
+    
     const getRate= async (price)=> {
 
         try{

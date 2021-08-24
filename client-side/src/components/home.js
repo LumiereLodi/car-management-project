@@ -61,7 +61,7 @@ const HomePage = ()=> {
                  *
                  * the variable userData is holding the user information and the user token.
                  * **/
-               await fetch("http://localhost:5000/cars", {
+               await fetch("/cars", {
                     method: "POST",
                     headers:{
                         "content-Type": "application/json",

@@ -22,7 +22,7 @@ const Login = ()=>{
 
             e.preventDefault();
             const loginUser = {email, password};
-            const loginRes = await Axios.post("http://localhost:5000/users/login", loginUser);
+            const loginRes = await Axios.post("/users/login", loginUser);
 
 
             setUserData({

@@ -16,7 +16,7 @@ const EditCar = ({cars})=> {
         e.preventDefault();
 
         try{
-            const response = await fetch(`http://localhost:5000/cars/${cars.car_id}`,{
+            const response = await fetch(`/cars/${cars.car_id}`,{
                 method: "PUT",
                 headers:{"content-Type": "application/json"},
                 body: JSON.stringify(car)

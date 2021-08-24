@@ -20,7 +20,7 @@ const User = require("./userModel");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-
+const path = require("path")
 
 const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
@@ -33,8 +33,14 @@ app.use(cors());
 app.use(express.json()); //req.body
 
 /**ROUTES**/
+//app.use(express.static("client-side/build"))
+
+if(process.env.NODE_ENV === "production"){
+    app.use(express.static("/client-side/build"))
+} 
 
 
+console.log(__dirname)
 /**CAR DATABASE**/
 
 
@@ -50,7 +56,7 @@ app.post("/cars", async (req, res) => {
         const newCar = await pool.query(sql, params);
         res.json(newCar.rows[0]);
     } catch (err) {
-        console.error(err.message);
+        res.status(400).json(err.message);
     }
 });
 
@@ -65,7 +71,7 @@ app.get("/cars", async (req, res) => {
         const allCars = await pool.query(sql, params);
         res.json(allCars.rows);
     } catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
 
     }
 });
@@ -78,7 +84,7 @@ app.get("/cars/:id", async (req, res) => {
         const car = await pool.query(sql, params);
         res.json(car.rows);
     } catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
     }
 });
 
@@ -90,7 +96,7 @@ app.put("/cars/:id", async (req, res) => {
         const updateCar = await pool.query(sql, params);
         res.json("To do was updated");
     } catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
     }
 })
 
@@ -102,7 +108,7 @@ app.delete("/cars/:id", async (req, res) => {
         const deletedCar = await pool.query(sql, params);
         res.json(`the make ${deletedCar.rows[0].make} has been deleted`);
     } catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
     }
 });
 
@@ -153,7 +159,7 @@ app.post("/users/register", async (req, res) => {
 
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
-        console.log(passwordHash);
+      
 
         const newUser = new User({
             email,
@@ -163,7 +169,7 @@ app.post("/users/register", async (req, res) => {
         const saveUser = await newUser.save();
         res.json(saveUser);
     } catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
     }
 });
 
@@ -192,7 +198,7 @@ app.post("/users/login", async (req, res)=>{
 
         /**the code below create the user token. and the User ID is attached to it**/
         const token = jwt.sign({id:user.user_id}, process.env.JWT_SECRET);
-        console.log(token);
+       
 
         /**here we do not return the password for security
          *
@@ -208,7 +214,7 @@ app.post("/users/login", async (req, res)=>{
         });
 
     }catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
     }
 });
 
@@ -223,15 +229,15 @@ app.post("/users/tokenIsValid", async (req, res) => {
          * **/
 
         const user = await User.findByPk(checkToken(req, res));
-        console.log(user);
+       
         if(!user){
-            console.log("inside user");
+          
             return res.json(false);
         }
 
         return res.json(true);
     }catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
     }
 })
 
@@ -249,7 +255,7 @@ app.get("/users",  async(req, res)=>{
             id: user.user_id,
         });
     }catch (err) {
-        console.log(err.message);
+        res.status(400).json(err.message);
     }
 });
 
@@ -272,15 +278,19 @@ const checkToken = (req, res)=>{
 
 
     }catch (err) {
-        console.log(err.message);
+       res.json(err.message);
     }
 
 }
 
+//can be handled in the front end.
+app.get("*", (req, res)=> {
+    console.log("random path")
+    res.sendFile("client-side/build/index.html")
+})
 
 
-
-
-app.listen(5000, () => {
-    console.log("Server has started");
+const port = process.env.PORT || 5000
+app.listen(port, () => {
+    console.log(`Listen to port ${port}`);
 })
