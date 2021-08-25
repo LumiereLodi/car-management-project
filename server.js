@@ -188,7 +188,7 @@ app.post("/users/register", async (req, res) => {
         )
         console.log("end of the first request")
         res.json(response.rows[0]);
-        console.log("passed the second request")
+        console.log("Registered")
     } catch (err) {
 
         console.log("then went to error")

@@ -23,14 +23,10 @@ const proConfig = process.env.DATABASE_URL;
 
 const pool = new Pool({
     connectionString:
-      process.env.NODE_ENV === "production" ? 
-      { proConfig, 
-        ssl: {
-          rejectUnauthorized: false
-        }
-    } : 
-    devConfig
-      
+      process.env.NODE_ENV === "production" ? proConfig : devConfig,
+      ssl: process.env.NODE_ENV === "production" ? {
+        rejectUnauthorized: false
+      } : undefined
   });
 
 
