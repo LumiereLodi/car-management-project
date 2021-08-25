@@ -223,6 +223,7 @@ app.post("/users/login", async (req, res)=>{
 
         }
 
+        console.log(user)
         /**the code below create the user token. and the User ID is attached to it**/
         const token = jwt.sign({id:user.rows[0].user_id}, process.env.JWT_SECRET);
        
@@ -231,6 +232,9 @@ app.post("/users/login", async (req, res)=>{
          *
          * we could also avoid to return the email. it is subjective
          * **/
+
+        console.log("after token creation")
+        
         res.json({
             token,
             user: {
