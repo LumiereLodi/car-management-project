@@ -193,6 +193,7 @@ app.post("/users/register", async (req, res) => {
 
         console.log("then went to error")
         res.status(400).json(err.message);
+        console.log(err)
     }
 });
 
