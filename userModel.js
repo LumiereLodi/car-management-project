@@ -18,7 +18,7 @@ const sequelize = new Sequelize('cars', 'postgres','lumiere', {
 
 
 /**DEFINING THE DATABASE TABLE**/
-const User = sequelize.define('userinfo', {
+const User = sequelize.define('userinfos', {
     user_id:{
         type: DataTypes.INTEGER,
         primaryKey: true,

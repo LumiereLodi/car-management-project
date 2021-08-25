@@ -26,7 +26,14 @@ const Register = ()=>{
 
             /**Registering the user**/
             const newUser = {email, password, passwordCheck, displayName};
-            await Axios.post("/users/register", newUser);
+            await Axios.post("/users/register", JSON.stringify(newUser, null, 2), 
+                {
+                    headers: {
+                        'Content-Type': "application/json"
+                        
+                    }
+                }
+            );
 
 
             /**when the user has registered we automatically log him/her in

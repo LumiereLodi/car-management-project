@@ -136,7 +136,7 @@ app.post("/users/register", async (req, res) => {
 
         //VALIDATION
         if (!email || !password || !passwordCheck) {
-            return res.status(400).json({msg: "Not all fields have been entered"});
+            return res.status(400).json({msg: "All Field required"});
         }
         if (password.length < 5) {
             return res.status(400).json({msg: "Password needs to be at least 5 characters long"});
@@ -144,7 +144,7 @@ app.post("/users/register", async (req, res) => {
         }
 
         if (password !== passwordCheck) {
-            return res.status(400).json({msg: "Entered the same password twice for verification"});
+            return res.status(400).json({msg: "Entere the same password twice for verification"});
 
         }
 
@@ -153,6 +153,8 @@ app.post("/users/register", async (req, res) => {
             return res.status(400).json({msg: "An account with this email already exists."});
 
         }
+
+        console.log("passed the first request")
         if (!displayName) {
             displayName = email;
         }
@@ -168,7 +170,10 @@ app.post("/users/register", async (req, res) => {
         })
         const saveUser = await newUser.save();
         res.json(saveUser);
+        console.log("passed the second request")
     } catch (err) {
+
+        console.log("then went to error")
         res.status(400).json(err.message);
     }
 });
@@ -178,13 +183,15 @@ app.post("/users/register", async (req, res) => {
 app.post("/users/login", async (req, res)=>{
     try{
         const {email, password} = req.body;
-
+        console.log("inside loggin")
         //validate
         if(!email || !password){
             return res.status(400).json({msg: "Not all fields have been entered."})
         }
 
         const user = await User.findOne({where: {email: email}});
+
+        console.log("passed the first request inside loggin")
         if(!user){
             return res.status(400).json({msg: "No account with this email has been registered"});
 
@@ -291,7 +298,7 @@ app.get("*", (req, res)=> {
 })
 
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log(`Listen to port ${port}`);
 })
