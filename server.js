@@ -144,10 +144,11 @@ app.post("/users/register", async (req, res) => {
         }
 
         if (password !== passwordCheck) {
-            return res.status(400).json({msg: "Entere the same password twice for verification"});
+            return res.status(400).json({msg: "Passwords do not match"});
 
         }
 
+        console.log("close to the the first request")
         const existingUser = await User.findOne({where:{email: email}});
         if (existingUser) {
             return res.status(400).json({msg: "An account with this email already exists."});
