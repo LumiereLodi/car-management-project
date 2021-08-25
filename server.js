@@ -159,16 +159,15 @@ app.post("/users/register", async (req, res) => {
        
         try {
         const result = await db.query("SELECT email from userinfos where email = $1", [email])
+        console.log("passed the first request")
         if (result.rowCount !== 0) {
             return res.status(400).json({msg: "An account with this email already exists."});
 
         }
-
-        console.log("passed the first request")
         if (!displayName) {
             displayName = email;
         }
-        console.log("passed the first request")
+    
         //const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, 10);
       

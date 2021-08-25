@@ -4,12 +4,12 @@ CREATE SEQUENCE userinfos_user_id_seq
 
 CREATE TABLE userinfos(
     user_id integer NOT NULL DEFAULT nextval('userinfos_user_id_seq'),
-    email character varying(255) COLLATE pg_catalog."default",
-    password character varying(255) COLLATE pg_catalog."default",
-    "passwordCheck" character varying(255) COLLATE pg_catalog."default",
-    "displayName" character varying(255) COLLATE pg_catalog."default",
+    email character varying(255) ,
+    password character varying(255) ,
+    "passwordCheck" character varying(255),
+    "displayName" character varying(255) ,
     "createdAt" TEXT DEFAULT to_char(now(), 'dd/mm/yyyy'),
-    "updatedAt" timestamp with time zone NOT NULL,
+    "updatedAt" Date,
     PRIMARY KEY (user_id)
 );
 
