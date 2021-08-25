@@ -17,7 +17,7 @@ const db = require("./db");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const User = require("./userModel");
-const jwt = require("jsonwebtoken");
+const {sign, verify} = require("jsonwebtoken");
 require("dotenv").config();
 
 const path = require("path")
@@ -223,10 +223,10 @@ app.post("/users/login", async (req, res)=>{
 
         }
 
-        console.log(user)
+        console.log(user.rows[0].user_id)
         /**the code below create the user token. and the User ID is attached to it**/
         console.log("see token below")
-        const token = jwt.sign({id:user.rows[0].user_id}, process.env.JWT_SECRET); //>>>>>>>>>>>  THE PROBLEM IS CURRENTLY HERE 6AM 25 08 2021
+        const token = sign({id:user.rows[0].user_id}, process.env.JWT_SECRET); //>>>>>>>>>>>  THE PROBLEM IS CURRENTLY HERE 6AM 25 08 2021
         console.log("user token: " + token)
 
         /**here we do not return the password for security
@@ -303,7 +303,7 @@ const checkToken = (req, res)=>{
             return res.json(false);
         }
 
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        const verified = verify(token, process.env.JWT_SECRET);
         if(!verified){
             return res.json(false);
         }
