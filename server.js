@@ -33,9 +33,11 @@ app.use(cors());
 app.use(express.json()); //req.body
 
 /**ROUTES**/
-//app.use(express.static("client-side/build"))
+app.use(express.static("client-side/build"))
 
 if(process.env.NODE_ENV === "production"){
+
+    console.log("it is production")
     app.use(express.static("/client-side/build"))
 } 
 
@@ -283,6 +285,7 @@ const checkToken = (req, res)=>{
 
 //can be handled in the front end.
 app.get("*", (req, res)=> {
+    console.log("inside unknown")
     res.sendFile(path.join(__dirname, "client-side/build/index.html"))
     //console.log(path.join(__dirname, "client-side/build/index.html"))
 })
