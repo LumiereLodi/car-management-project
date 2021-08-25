@@ -41,18 +41,43 @@ if(process.env.NODE_ENV === "production"){
     app.use(express.static("/client-side/build"))
 } 
 
+//verify if the user token is valide
+
+const checkToken = (req, res, next)=>{
+    try{
+        const token = req.header("x-auth-token");
+        if(!token){
+            return res.json(false);
+        }
+
+        const verified = verify(token, process.env.JWT_SECRET);
+        if(!verified){
+            return res.json(false);
+        }
+
+        req.id = verified.id
+       //return verified.id;
+       next();
+
+
+    }catch (err) {
+       res.json(err.message);
+    }
+
+}
+
 /**CAR DATABASE**/
 
 
 /**CREATE/ADD A CAR**/
-app.post("/cars", async (req, res) => {
+app.post("/cars",checkToken, async (req, res) => {
     try {
 
 
-        const user_id = await User.findByPk(checkToken(req, res));
+       // const user_id = await User.findByPk(checkToken(req, res));
 
         const sql = "INSERT INTO car (model, make, mileage, year, price, user_id) VALUES($1, $2, $3, $4, $5, $6) returning * ";
-        const params = [req.body.model, req.body.make, req.body.mileage, req.body.year, req.body.price, user_id.user_id ];
+        const params = [req.body.model, req.body.make, req.body.mileage, req.body.year, req.body.price, req.id ];
         const newCar = await db.query(sql, params);
         res.json(newCar.rows[0]);
     } catch (err) {
@@ -61,13 +86,13 @@ app.post("/cars", async (req, res) => {
 });
 
 /**GET ALL CARS**/
-app.get("/cars", async (req, res) => {
+app.get("/cars",checkToken, async (req, res) => {
 
     try {
-        const user_id = await User.findByPk(checkToken(req, res));
+        //const user_id = await User.findByPk(checkToken(req, res));
 
         const sql = "SELECT * FROM car where user_id = $1";
-        const params = [user_id.user_id];
+        const params = [req.id];
         const allCars = await db.query(sql, params);
         res.json(allCars.rows);
     } catch (err) {
@@ -202,7 +227,7 @@ app.post("/users/register", async (req, res) => {
 app.post("/users/login", async (req, res)=>{
     try{
         const {email, password} = req.body;
-        console.log("inside loggin")
+        console.log("inside login")
         //validate
         if(!email || !password){
             return res.status(400).json({msg: "Not all fields have been entered."})
@@ -253,7 +278,7 @@ app.post("/users/login", async (req, res)=>{
 
 
 /**we want to check whether the user token is valid**/
-app.post("/users/tokenIsValid", async (req, res) => {
+app.post("/users/tokenIsValid",checkToken, async (req, res) => {
     try{
 
         /**the checkToken is the function which actually checks the token
@@ -261,31 +286,34 @@ app.post("/users/tokenIsValid", async (req, res) => {
          * which return the user ID that we need here.
          * **/
 
-        const user = await User.findByPk(checkToken(req, res));
+        //const user = await User.findByPk(checkToken(req, res));
        
+        /*
         if(!user){
           
             return res.json(false);
         }
-
+            */
         return res.json(true);
     }catch (err) {
         res.status(400).json(err.message);
     }
 })
 
-app.get("/users",  async(req, res)=>{
+app.get("/users",checkToken,  async(req, res)=>{
     // const user = await User.findByPk(req.user);
     // res.json(user);
 
+    
     try{
-        const user = await User.findByPk(checkToken(req, res));
-
-
+        //const user = await User.findByPk(checkToken(req, res));
+        console.log("user id from /users: " + req.id)
+        const user = await db.query("SELECT displayname, user_id FROM userinfos WHERE user_id = $1", [req.id])
+        console.log("user info from /users: " + user.rows[0].displayname)
 
         res.json({
-            displayName: user.displayName,
-            id: user.user_id,
+            displayName: user.rows[0].displayname,
+            id: user.rows[0].user_id,
         });
     }catch (err) {
         res.status(400).json(err.message);
@@ -296,25 +324,7 @@ app.get("/users",  async(req, res)=>{
 /**this function is called to check the user token and return the id of the user
  * and the id is used to identify the user who is currently log in.
  **/
-const checkToken = (req, res)=>{
-    try{
-        const token = req.header("x-auth-token");
-        if(!token){
-            return res.json(false);
-        }
 
-        const verified = verify(token, process.env.JWT_SECRET);
-        if(!verified){
-            return res.json(false);
-        }
-       return verified.id;
-
-
-    }catch (err) {
-       res.json(err.message);
-    }
-
-}
 
 //can be handled in the front end.
 app.get("*", (req, res)=> {
