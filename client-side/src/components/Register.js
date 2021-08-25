@@ -57,9 +57,9 @@ const Register = ()=>{
         <Fragment>
             <div className="container">
                 <div className="row">
-                    <div className="col-sm-8 col-md-8">
+                    <div className="col-sm-12 col-md-12 col-xs">
                         <div className="login">
-                            <form onSubmit={submit}>
+                            <form onSubmit={submit} className="col-sm-12 col-md-12 col-xs">
                                 <div className="row justify-content-md-center form-title">
                                     <h1 >Register</h1>
 

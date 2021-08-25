@@ -1,6 +1,6 @@
 .car-detail{
 
-    width: 60%;
+    width: 90%;
     margin:16px auto;
     border:1px solid #eee;
     box-shadow: 0 2px 3px #ccc;
@@ -10,7 +10,7 @@
 }
 
 .login{
-    width: 60%;
+    width: 100%;
     margin:16px auto;
     border:1px solid #eee;
     box-shadow: 0 2px 3px #ccc;
