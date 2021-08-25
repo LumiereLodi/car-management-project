@@ -13,7 +13,7 @@
 
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db");
+const db = require("./db");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const User = require("./userModel");
@@ -53,7 +53,7 @@ app.post("/cars", async (req, res) => {
 
         const sql = "INSERT INTO car (model, make, mileage, year, price, user_id) VALUES($1, $2, $3, $4, $5, $6) returning * ";
         const params = [req.body.model, req.body.make, req.body.mileage, req.body.year, req.body.price, user_id.user_id ];
-        const newCar = await pool.query(sql, params);
+        const newCar = await db.query(sql, params);
         res.json(newCar.rows[0]);
     } catch (err) {
         res.status(400).json(err.message);
@@ -68,7 +68,7 @@ app.get("/cars", async (req, res) => {
 
         const sql = "SELECT * FROM car where user_id = $1";
         const params = [user_id.user_id];
-        const allCars = await pool.query(sql, params);
+        const allCars = await db.query(sql, params);
         res.json(allCars.rows);
     } catch (err) {
         res.status(400).json(err.message);
@@ -81,7 +81,7 @@ app.get("/cars/:id", async (req, res) => {
     try {
         const sql = "SELECT * FROM car WHERE car_id =$1"
         const params = [req.params.id];
-        const car = await pool.query(sql, params);
+        const car = await db.query(sql, params);
         res.json(car.rows);
     } catch (err) {
         res.status(400).json(err.message);
@@ -93,7 +93,7 @@ app.put("/cars/:id", async (req, res) => {
     try {
         const sql = "UPDATE car SET model=$1, make=$2, mileage=$3, year=$4, price=$5 WHERE car_id = $6";
         const params = [req.body.model, req.body.make, req.body.mileage, req.body.year, req.body.price, req.params.id];
-        const updateCar = await pool.query(sql, params);
+        const updateCar = await db.query(sql, params);
         res.json("To do was updated");
     } catch (err) {
         res.status(400).json(err.message);
@@ -105,7 +105,7 @@ app.delete("/cars/:id", async (req, res) => {
     try {
         const sql = "DELETE FROM car WHERE car_id = $1 returning *"
         const params = [req.params.id];
-        const deletedCar = await pool.query(sql, params);
+        const deletedCar = await db.query(sql, params);
         res.json(`the make ${deletedCar.rows[0].make} has been deleted`);
     } catch (err) {
         res.status(400).json(err.message);
@@ -129,7 +129,7 @@ app.delete("/cars/:id", async (req, res) => {
 
 /**this is used to register the user**/
 app.post("/users/register", async (req, res) => {
-    try {
+    
 
 
         let {email, password, passwordCheck, displayName} = req.body;
@@ -149,8 +149,17 @@ app.post("/users/register", async (req, res) => {
         }
 
         console.log("close to the the first request")
+        /*
         const existingUser = await User.findOne({where:{email: email}});
         if (existingUser) {
+            return res.status(400).json({msg: "An account with this email already exists."});
+
+        }
+        */    
+       
+        try {
+        const result = await db.query("SELECT email from userinfos where email = $1", [email])
+        if (result.rowCount !== 0) {
             return res.status(400).json({msg: "An account with this email already exists."});
 
         }
@@ -159,18 +168,27 @@ app.post("/users/register", async (req, res) => {
         if (!displayName) {
             displayName = email;
         }
-
-        const salt = await bcrypt.genSalt();
-        const passwordHash = await bcrypt.hash(password, salt);
+        console.log("passed the first request")
+        //const salt = await bcrypt.genSalt();
+        const passwordHash = await bcrypt.hash(password, 10);
       
-
+/*
         const newUser = new User({
             email,
             password: passwordHash,
             displayName,
         })
-        const saveUser = await newUser.save();
-        res.json(saveUser);
+        */
+        //const saveUser = await newUser.save();
+        
+        console.log(passwordHash)
+        const response = await db.query("INSERT INTO userinfos(email, password, displayname) VALUES($1, $2, $3) RETURNING *", 
+        
+        [email, passwordHash, displayName]
+
+        )
+        console.log("end of the first request")
+        res.json(response.rows[0]);
         console.log("passed the second request")
     } catch (err) {
 
@@ -190,22 +208,23 @@ app.post("/users/login", async (req, res)=>{
             return res.status(400).json({msg: "Not all fields have been entered."})
         }
 
-        const user = await User.findOne({where: {email: email}});
-
-        console.log("passed the first request inside loggin")
-        if(!user){
+        const user = await db.query("SELECT displayname, user_id, email from userinfos where email = $1 ", [email])
+        
+       
+        if(user.rowCount === 0){
             return res.status(400).json({msg: "No account with this email has been registered"});
 
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        const dbPassword = await db.query("SELECT password FROM userinfos where email = $1", [email])
+        const isMatch = await bcrypt.compare(password, dbPassword.rows[0].password);
         if(!isMatch){
             return res.status(400).json({msg: "Invalid credentials."});
 
         }
 
         /**the code below create the user token. and the User ID is attached to it**/
-        const token = jwt.sign({id:user.user_id}, process.env.JWT_SECRET);
+        const token = jwt.sign({id:user.rows[0].user_id}, process.env.JWT_SECRET);
        
 
         /**here we do not return the password for security
@@ -215,11 +234,12 @@ app.post("/users/login", async (req, res)=>{
         res.json({
             token,
             user: {
-                id: user.user_id,
-                displayName: user.displayName,
-                email: user.email,
+                id: user.rows[0].user_id,
+                displayName: user.rows[0].displayname,
+                email: user.rows[0].email,
             },
         });
+        console.log("loggin worked")
 
     }catch (err) {
         res.status(400).json(err.message);
