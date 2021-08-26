@@ -60,8 +60,6 @@ function App() {
                     token,
                     user: userRes.data,
                 });
-            }else{
-                alert("You are not authenticated")
             }
         }
 
